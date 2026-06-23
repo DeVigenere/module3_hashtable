@@ -8,7 +8,7 @@
 
 constexpr double fill_factor = 0.75;
 
-template <typename K, typename V>
+template <typename K, typename V, typename Hash = std::hash<K>>
 class HashTable {
 	struct Item {
 		K key;
@@ -18,16 +18,16 @@ class HashTable {
 	std::vector<std::list<Item>> table;
 	size_t capacity;
 	size_t size;
+	Hash hasher;
 
-	unsigned long hash(const K& key, size_t cap) const {
-		std::hash<K> hasher;
+	size_t hash(const K& key, size_t cap) const {
 		return hasher(key) % cap;
 	}
-	unsigned long hash(const K& key) const {
+	size_t hash(const K& key) const {
 		return hash(key, capacity);
 	}
 public:
-	HashTable(size_t cap = 32) : capacity(cap), size(0) {
+	HashTable(size_t cap = 32, const Hash& hash = Hash()) : capacity(cap), size(0), hasher(hash) {
 		if (capacity == 0) {
 			throw std::runtime_error("capacity cannot be 0!");
 		}

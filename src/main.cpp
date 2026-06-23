@@ -1,21 +1,33 @@
-#include "HashTable.h"
+﻿#include "HashTable.h"
+#include <unordered_map>
+#include <chrono>
+#include <iostream>
+#include <vector>
+#include <string>
 
 int main() {
-	HashTable<std::string, int> ht;
-	ht.insert("a", 1);
-	ht.insert("b", 2);
-	ht.insert("c", 3);
-	ht.contains("a");
-	ht.remove("b");
-	ht.find("c");
-	ht.rehash();
-	ht.statistics();
-	std::cout << std::endl;
+    const int N = 100000;
+    std::vector<std::string> keys;
+    for (int i = 0; i < N; ++i) {
+        keys.push_back("element_" + std::to_string(i));
+    }
+    auto start = std::chrono::high_resolution_clock::now();
+    HashTable<std::string, int> my_ht;
+    for (int i = 0; i < N; ++i) {
+        my_ht.insert(keys[i], i * 2);
+    }
+    auto end = std::chrono::high_resolution_clock::now();
+    auto my_time = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    start = std::chrono::high_resolution_clock::now();
+    std::unordered_map<std::string, int> std_ht;
+    for (int i = 0; i < N; ++i) {
+        std_ht[keys[i]] = i * 2;
+    }
+    end = std::chrono::high_resolution_clock::now();
+    auto std_time = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    std::cout << "my hashtable: " << my_time.count() << "ns" << std::endl;
+    std::cout << "unordered_map: " << std_time.count() << "ns" << std::endl;
+    my_ht.statistics();
 
-	HashTable<std::string, int> ht5;
-	for (int i = 0; i < 10000; ++i) {
-		std::string key = "element_" + std::to_string(i);
-		ht5.insert(key, i * 2);
-	}
-	ht5.statistics();
+    return 0;
 }
